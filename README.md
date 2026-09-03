@@ -1,4 +1,4 @@
-# 🎣 Phishing Investigation Platform
+#  Phishing Investigation Platform
 
 An automated **SOC Phishing Investigation Tool** that ingests a raw `.eml` file
 and produces a full triage report: sender/authentication analysis, IOC
@@ -208,23 +208,23 @@ python integrations/elastic_index.py --report reports/phish_report.json \
 
 Each detected indicator adds a weight to a 0–100 score (capped at 100):
 
-| Indicator                        | Weight |
+Indicator                        | Weight |
 |-----------------------------------|:------:|
-| Suspicious Sender                 | 20     |
-| SPF/DKIM/DMARC Failure            | 12     |
-| Newly Registered Domain           | 20     |
-| Malicious URL (VirusTotal)        | 25     |
-| Suspicious Link (display/href)    | 8      |
-| Malicious Attachment (VT/YARA)    | 25     |
-| Risky Attachment Extension        | 10     |
-| Malicious IP (AbuseIPDB)          | 10     |
-| Header Anomaly                    | 5      |
+Suspicious Sender                 | 20     
+SPF/DKIM/DMARC Failure            | 12     
+Newly Registered Domain           | 20     
+Malicious URL (VirusTotal)        | 25     
+Suspicious Link (display/href)    | 8      
+Malicious Attachment (VT/YARA)    | 25     
+Risky Attachment Extension        | 10     
+Malicious IP (AbuseIPDB)          | 10     
+Header Anomaly                    | 5      
 
-| Score   | Severity |
-|---------|----------|
-| ≥ 70    | HIGH     |
-| 40–69   | MEDIUM   |
-| < 40    | LOW      |
+Score   | Severity |
+|-----------------------------------|
+≥ 70    | HIGH     
+40–69   | MEDIUM   
+< 40    | LOW      
 
 Weights and thresholds are fully configurable in `config/config.yaml`.
 
@@ -266,6 +266,4 @@ should be reviewed and executed by a human analyst. Risk scores are
 heuristic, not ground truth — always validate HIGH/MEDIUM verdicts before
 acting on them.
 
-## License
 
-MIT — see [LICENSE](LICENSE).
