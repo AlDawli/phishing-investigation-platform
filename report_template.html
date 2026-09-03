@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Phishing Investigation Report - {{ subject }}</title>
+<style>
+  :root {
+    --high: #d92626; --medium: #e8973a; --low: #2e9e4f; --bg: #0f1520; --panel:#161e2b;
+    --text:#e6ecf5; --muted:#8b97a8; --accent:#4f8cff;
+  }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); margin:0; padding:0; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 32px; }
+  h1 { font-size: 22px; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); margin-bottom: 24px; }
+  .score-panel { display:flex; gap:16px; align-items:center; background:var(--panel); border-radius:10px; padding:20px; margin-bottom:24px; border:1px solid #263143;}
+  .score-circle { width:100px; height:100px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; font-weight:bold; flex-shrink:0; }
+  .sev-HIGH { background: rgba(217,38,38,0.15); color: var(--high); border: 3px solid var(--high); }
+  .sev-MEDIUM { background: rgba(232,151,58,0.15); color: var(--medium); border: 3px solid var(--medium); }
+  .sev-LOW { background: rgba(46,158,79,0.15); color: var(--low); border: 3px solid var(--low); }
+  .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; letter-spacing:0.5px; }
+  .indicators { list-style:none; padding:0; margin:8px 0 0 0; }
+  .indicators li { padding:4px 0 4px 22px; position:relative; }
+  .indicators li:before { content:"▲"; position:absolute; left:0; color: var(--high); font-size:11px; top:7px; }
+  section { background: var(--panel); border:1px solid #263143; border-radius:10px; padding:20px; margin-bottom:18px; }
+  section h2 { font-size:15px; text-transform:uppercase; letter-spacing:0.6px; color:var(--accent); margin-top:0; border-bottom:1px solid #263143; padding-bottom:10px;}
+  table { width:100%; border-collapse: collapse; font-size:13px; }
+  td, th { text-align:left; padding:6px 8px; border-bottom:1px solid #1f2836; vertical-align: top; }
+  th { color: var(--muted); font-weight:600; width: 220px;}
+  .pill { padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; }
+  .pill-fail { background: rgba(217,38,38,0.15); color: var(--high);}
+  .pill-pass { background: rgba(46,158,79,0.15); color: var(--low);}
+  .mono { font-family: 'Consolas', 'SFMono-Regular', monospace; font-size:12px; word-break:break-all; }
+  .findings-list { margin:6px 0 0 18px; padding:0; color:var(--muted); font-size:13px;}
+  .mitre-chip { display:inline-block; background:#1c2636; border:1px solid #2e3c53; color:var(--accent); padding:3px 8px; margin:3px 4px 0 0; border-radius:6px; font-size:12px;}
+  footer { text-align:center; color:var(--muted); font-size:11px; margin-top:20px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>SOC Phishing Investigation Report</h1>
+  <div class="subtitle">Subject: {{ subject }} &nbsp;|&nbsp; From: {{ from_addr }} &nbsp;|&nbsp; Generated: {{ generated_at }}</div>
+
+  <div class="score-panel">
+    <div class="score-circle sev-{{ severity }}">{{ risk_score }}</div>
+    <div>
+      <div><span class="badge sev-{{ severity }}">SEVERITY: {{ severity }}</span></div>
+      <ul class="indicators">
+        {% for indicator in indicators %}
+        <li>{{ indicator }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+
+  <section>
+    <h2>Sender Analysis</h2>
+    <table>
+      <tr><th>From</th><td>{{ from_addr }} ({{ from_display }})</td></tr>
+      <tr><th>Sender Domain</th><td>{{ header.from_domain }}</td></tr>
+      <tr><th>Reply-To Domain</th><td>{{ header.reply_to_domain or "—" }}</td></tr>
+      <tr><th>Return-Path Domain</th><td>{{ header.return_path_domain or "—" }}</td></tr>
+      <tr><th>Suspicious Sender</th><td>{{ "YES" if header.suspicious_sender else "No" }}</td></tr>
+    </table>
+    {% if header.findings %}<ul class="findings-list">{% for f in header.findings %}<li>{{ f }}</li>{% endfor %}</ul>{% endif %}
+  </section>
+
+  <section>
+    <h2>SPF / DKIM / DMARC</h2>
+    <table>
+      <tr><th>SPF</th><td><span class="pill {{ 'pill-pass' if auth.spf.result=='pass' else 'pill-fail' }}">{{ auth.spf.result|upper }}</span></td></tr>
+      <tr><th>DKIM</th><td><span class="pill {{ 'pill-pass' if auth.dkim.result=='pass' else 'pill-fail' }}">{{ auth.dkim.result|upper }}</span></td></tr>
+      <tr><th>DMARC</th><td><span class="pill {{ 'pill-pass' if auth.dmarc.result.startswith('pass') else 'pill-fail' }}">{{ auth.dmarc.result|upper }}</span></td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Header Analysis</h2>
+    <table>
+      <tr><th>Received Hop Count</th><td>{{ header.received_hop_count }}</td></tr>
+      <tr><th>Mailer / User-Agent</th><td>{{ x_mailer or "—" }}</td></tr>
+      <tr><th>Suspicious Mailer</th><td>{{ "YES" if header.suspicious_mailer else "No" }}</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>URL Extraction &amp; Domain / IP Reputation</h2>
+    <table>
+      <tr><th>URLs Found</th><td>{{ url.url_count }}</td></tr>
+      <tr><th>Shortener Links</th><td>{{ url.shortener_count }}</td></tr>
+      <tr><th>Display/Href Mismatches</th><td>{{ url.display_href_mismatches|length }}</td></tr>
+      <tr><th>Newly Registered Domains</th><td>{{ "YES" if domain.any_newly_registered else "No" }}</td></tr>
+    </table>
+    {% if url.urls %}
+    <table style="margin-top:10px;">
+      <tr><th>URL</th><th style="width:auto;">Domain</th><th style="width:auto;">VT Malicious</th></tr>
+      {% for u in url.urls %}
+      <tr>
+        <td class="mono">{{ u.url }}</td>
+        <td>{{ u.domain }}</td>
+        <td>{{ vt_url_scores.get(u.url, "not checked") }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>Attachment Analysis</h2>
+    {% if attachment.attachments %}
+    <table>
+      <tr><th>Filename</th><th style="width:auto;">SHA256</th><th style="width:auto;">YARA</th><th style="width:auto;">VT Malicious</th></tr>
+      {% for a in attachment.attachments %}
+      <tr>
+        <td>{{ a.filename }}</td>
+        <td class="mono">{{ a.sha256 }}</td>
+        <td>{{ a.yara_matches|join(", ") or "—" }}</td>
+        <td>{{ vt_hash_scores.get(a.sha256, "not checked") }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    {% else %}
+    <p style="color:var(--muted)">No attachments found.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2>MITRE ATT&amp;CK Mapping</h2>
+    {% for t in mitre %}
+    <span class="mitre-chip">{{ t.technique_id }} — {{ t.technique_name }}</span>
+    {% endfor %}
+  </section>
+
+  <footer>Generated by Phishing Investigation Platform | Automated SOC triage aid — analyst validation required before containment action.</footer>
+</div>
+</body>
+</html>

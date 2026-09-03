@@ -1,0 +1,59 @@
+Delivered-To: victim@example-corp.com
+Received: by mail.example-corp.com; Wed, 03 Sep 2026 08:12:03 -0700
+Received: from mail-relay.suspicious-infra.tk (mail-relay.suspicious-infra.tk [185.220.101.45])
+	by mx.example-corp.com with ESMTPS id abc123
+	for <victim@example-corp.com>; Wed, 03 Sep 2026 08:12:01 -0700
+Authentication-Results: mx.example-corp.com;
+	spf=fail smtp.mailfrom=micros0ft-secure.tk;
+	dkim=fail header.d=micros0ft-secure.tk;
+	dmarc=fail (p=reject) header.from=micros0ft-secure.tk
+From: "Microsoft Account Security" <alerts@micros0ft-secure.tk>
+Reply-To: recovery-team@totally-legit-billing.xyz
+Return-Path: <bounce@micros0ft-secure.tk>
+To: victim@example-corp.com
+Subject: Urgent: Unusual sign-in activity detected on your account
+Date: Wed, 03 Sep 2026 08:11:58 -0700
+Message-ID: <a1b2c3d4e5f6@micros0ft-secure.tk>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="BOUNDARY123"
+
+--BOUNDARY123
+Content-Type: multipart/alternative; boundary="ALT456"
+
+--ALT456
+Content-Type: text/plain; charset="UTF-8"
+
+We detected unusual sign-in activity on your Microsoft account.
+Please verify your identity immediately to avoid account suspension:
+https://micros0ft-secure.tk/verify-account?id=8834
+
+If you did not request this, secure your account here: https://bit.ly/3xVerifyAcct
+
+Microsoft Account Team
+
+--ALT456
+Content-Type: text/html; charset="UTF-8"
+
+<html>
+<body>
+<p>We detected unusual sign-in activity on your Microsoft account.</p>
+<p>Please verify your identity immediately to avoid account suspension:</p>
+<p><a href="https://micros0ft-secure.tk/verify-account?id=8834">https://account.microsoft.com/verify</a></p>
+<p>If you did not request this, secure your account here:
+<a href="https://bit.ly/3xVerifyAcct">Secure My Account</a></p>
+<p>Microsoft Account Team</p>
+</body>
+</html>
+
+--ALT456--
+
+--BOUNDARY123
+Content-Type: application/vnd.ms-excel.sheet.macroEnabled.12; name="Account_Verification_Form.xlsm"
+Content-Disposition: attachment; filename="Account_Verification_Form.xlsm"
+Content-Transfer-Encoding: base64
+
+UEsDBAoAAAAAAIdO4kAAAAAAAAAAAAAAAAAJAAAAX3JlbHMvLnJlbHNQSwECFAAKAAAAAACHTuJA
+AAAAAAAAAAAAAAAACQAAAAAAAAAAABAA7UEAAAAAX3JlbHMvLnJlbHNQSwUGAAAAAAEAAQA3AAAA
+LwAAAAAA
+
+--BOUNDARY123--

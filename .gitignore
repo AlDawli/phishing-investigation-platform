@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.env
+config/config.yaml
+reports/*.html
+reports/*.json
+reports/*.pdf
+!reports/.gitkeep
+webapp/uploads/*
+!webapp/uploads/.gitkeep
+.venv/
+venv/
+*.log
+.DS_Store
+.idea/
+.vscode/

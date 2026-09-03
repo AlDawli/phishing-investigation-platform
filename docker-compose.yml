@@ -1,0 +1,13 @@
+services:
+  phishing-investigation-platform:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./config:/app/config
+      - ./reports:/app/reports
+      - ./webapp/uploads:/app/webapp/uploads
+    environment:
+      - VT_API_KEY=${VT_API_KEY:-}
+      - ABUSEIPDB_API_KEY=${ABUSEIPDB_API_KEY:-}
+    restart: unless-stopped

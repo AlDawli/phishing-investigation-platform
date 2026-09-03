@@ -1,0 +1,24 @@
+# Copy this file to config/config.yaml and fill in your own API keys.
+# config/config.yaml is git-ignored so secrets never get committed.
+# All keys are optional -- the tool degrades gracefully and simply skips
+# any enrichment step whose API key is missing.
+
+virustotal:
+  api_key: ""          # https://www.virustotal.com/gui/my-apikey
+
+abuseipdb:
+  api_key: ""           # https://www.abuseipdb.com/account/api
+
+otx:
+  api_key: ""           # https://otx.alienvault.com/api
+
+scoring:
+  newly_registered_days: 30   # domains younger than this are flagged
+  thresholds:
+    HIGH: 70
+    MEDIUM: 40
+    LOW: 0
+
+network:
+  enable_live_lookups: true   # set false to run fully offline (WHOIS/DNS/VT skipped)
+  request_timeout: 10

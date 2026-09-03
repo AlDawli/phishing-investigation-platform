@@ -1,0 +1,14 @@
+python-whois==0.9.4
+dnspython==2.6.1
+dkimpy==1.1.5
+requests==2.32.3
+PyYAML==6.0.2
+Jinja2==3.1.4
+yara-python==4.5.1
+tldextract==5.1.2
+python-Levenshtein==0.25.1
+beautifulsoup4==4.12.3
+lxml==5.2.2
+rich==13.7.1
+Flask==3.0.3
+gunicorn==22.0.0

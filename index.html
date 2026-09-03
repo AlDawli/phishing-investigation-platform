@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phishing Investigation Platform</title>
+<style>
+  :root { --bg:#0f1520; --panel:#161e2b; --text:#e6ecf5; --muted:#8b97a8; --accent:#4f8cff; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center; }
+  .wrap { max-width: 560px; width:100%; padding: 32px; }
+  h1 { font-size: 22px; margin-bottom:4px; }
+  .subtitle { color: var(--muted); margin-bottom:28px; font-size:14px; }
+  .dropzone {
+    border: 2px dashed #2e3c53; border-radius: 14px; background: var(--panel);
+    padding: 48px 24px; text-align:center; cursor:pointer; transition: border-color .15s, background .15s;
+  }
+  .dropzone.dragover { border-color: var(--accent); background: #1a2436; }
+  .dropzone .icon { font-size:40px; margin-bottom:12px; }
+  .dropzone p { color: var(--muted); margin: 4px 0; font-size:14px; }
+  .dropzone .filename { color: var(--accent); font-weight:600; margin-top:10px; word-break:break-all; }
+  input[type=file] { display:none; }
+  button {
+    width:100%; margin-top:20px; padding:12px; border:none; border-radius:8px;
+    background: var(--accent); color:white; font-size:15px; font-weight:600; cursor:pointer;
+  }
+  button:disabled { opacity:0.5; cursor:not-allowed; }
+  .flash { background: rgba(217,38,38,0.15); border:1px solid #d92626; color:#ff8080; padding:10px 14px; border-radius:8px; margin-bottom:16px; font-size:13px; }
+  footer { text-align:center; color:var(--muted); font-size:11px; margin-top:24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>🎣 Phishing Investigation Platform</h1>
+  <div class="subtitle">Drop a .eml file for automated SOC triage: IOC enrichment, YARA scanning, MITRE mapping, and risk scoring.</div>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      {% for m in messages %}<div class="flash">{{ m }}</div>{% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <form action="/analyze" method="post" enctype="multipart/form-data" id="uploadForm">
+    <label class="dropzone" id="dropzone">
+      <div class="icon">📧</div>
+      <p><strong>Click to browse</strong> or drag &amp; drop a .eml file here</p>
+      <div class="filename" id="filename"></div>
+      <input type="file" name="eml_file" id="fileInput" accept=".eml">
+    </label>
+    <button type="submit" id="submitBtn" disabled>Run Investigation</button>
+  </form>
+
+  <footer>Automated SOC triage aid — analyst validation required before containment action.</footer>
+</div>
+
+<script>
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const filenameEl = document.getElementById('filename');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function showFile(file) {
+    if (file) {
+      filenameEl.textContent = file.name;
+      submitBtn.disabled = false;
+    }
+  }
+
+  fileInput.addEventListener('change', () => showFile(fileInput.files[0]));
+
+  ['dragover', 'dragenter'].forEach(evt =>
+    dropzone.addEventListener(evt, e => { e.preventDefault(); dropzone.classList.add('dragover'); })
+  );
+  ['dragleave', 'dragend'].forEach(evt =>
+    dropzone.addEventListener(evt, e => dropzone.classList.remove('dragover'))
+  );
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      fileInput.files = e.dataTransfer.files;
+      showFile(file);
+    }
+  });
+
+  document.getElementById('uploadForm').addEventListener('submit', () => {
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Analyzing...';
+  });
+</script>
+</body>
+</html>
